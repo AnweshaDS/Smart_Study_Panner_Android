@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:padding="24dp"
-    android:gravity="center"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -17,13 +16,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <Button android:id="@+id/btnLogin"
-        android:text="Login"
+    <EditText android:id="@+id/etEmail"
+        android:hint="Email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <Button android:id="@+id/btnSignup"
-        android:text="Signup"
+    <Button android:id="@+id/btnRegister"
+        android:text="Register"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 </LinearLayout>

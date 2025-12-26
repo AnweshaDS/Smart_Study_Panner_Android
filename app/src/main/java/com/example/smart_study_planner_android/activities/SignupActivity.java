@@ -1,6 +1,5 @@
 package com.example.smart_study_planner_android.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,36 +11,35 @@ import com.example.smart_study_planner_android.R;
 import com.example.smart_study_planner_android.activities.database.UserDAO;
 import com.example.smart_study_planner_android.activities.model.User;
 
-public class LoginActivity extends AppCompatActivity {
+public class SignupActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_signup);
 
         EditText username = findViewById(R.id.etUsername);
         EditText password = findViewById(R.id.etPassword);
-        Button btnLogin = findViewById(R.id.btnLogin);
-        Button btnSignup = findViewById(R.id.btnSignup);
+        EditText email = findViewById(R.id.etEmail);
+        Button btnRegister = findViewById(R.id.btnRegister);
 
         UserDAO dao = new UserDAO(this);
 
-        btnLogin.setOnClickListener(v -> {
-            User user = dao.login(
-                    username.getText().toString(),
-                    password.getText().toString()
+        btnRegister.setOnClickListener(v -> {
+            boolean success = dao.register(
+                    new User(
+                            username.getText().toString(),
+                            password.getText().toString(),
+                            email.getText().toString()
+                    )
             );
 
-            if (user == null) {
-                Toast.makeText(this, "Invalid login", Toast.LENGTH_SHORT).show();
-            } else {
-                startActivity(new Intent(this, MainActivity.class));
+            if (success) {
+                Toast.makeText(this, "Signup successful", Toast.LENGTH_SHORT).show();
                 finish();
+            } else {
+                Toast.makeText(this, "User already exists", Toast.LENGTH_SHORT).show();
             }
         });
-
-        btnSignup.setOnClickListener(v ->
-                startActivity(new Intent(this, SignupActivity.class))
-        );
     }
 }
