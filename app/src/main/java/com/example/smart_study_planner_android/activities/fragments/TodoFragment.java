@@ -10,6 +10,7 @@ import android.widget.*;
 import androidx.fragment.app.Fragment;
 
 import com.example.smart_study_planner_android.R;
+import com.example.smart_study_planner_android.activities.adapters.TaskAdapter;
 import com.example.smart_study_planner_android.activities.database.TaskDAO;
 import com.example.smart_study_planner_android.activities.model.Task;
 
@@ -66,11 +67,8 @@ public class TodoFragment extends Fragment {
 
     private void loadTasks(ListView list) {
         tasks = dao.getTasksByStatus(TaskDAO.TODO);
-        adapter = new ArrayAdapter<>(
-                requireContext(),
-                android.R.layout.simple_list_item_1,
-                tasks.stream().map(Task::getTitle).toArray(String[]::new)
-        );
+        list.setAdapter(new TaskAdapter(requireContext(), tasks));
+
         list.setAdapter(adapter);
     }
 }

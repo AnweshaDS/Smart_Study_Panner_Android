@@ -72,4 +72,10 @@ public class TaskDAO {
         db.update("tasks", cv, "id=?", new String[]{String.valueOf(taskId)});
         db.close();
     }
+    public void deleteTask(int id) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.delete("tasks", "id=?", new String[]{String.valueOf(id)});
+        db.close();
+    }
+
 }

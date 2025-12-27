@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Smart_Study_planner_Android</string>
+    <string name="delete">Delete</string>
+    <string name="start">Start</string>
+    <string name="pause">Pause</string>
+    <string name="finish">Finish</string>
+    <string name="delete2">Delete</string>
+    <string name="run">run</string>
+    <string name="delete3">delete3</string>
 </resources>

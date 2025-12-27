@@ -1,0 +1,46 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@drawable/item_bg"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#EF6C00"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        style="?android:attr/buttonBarStyle"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btnRun"
+            style="?android:attr/buttonBarButtonStyle"
+            android:text="@string/run"
+            android:layout_height="60dp"
+            android:layout_width="100dp" />
+
+        <Button
+            android:id="@+id/btnFinish"
+            style="?android:attr/buttonBarButtonStyle"
+            android:text="@string/finish"
+            android:layout_height="60dp"
+            android:layout_width="100dp" />
+
+        <Button
+            android:id="@+id/btnDelete"
+            style="?android:attr/buttonBarButtonStyle"
+            android:text="@string/delete"
+            android:layout_height="60dp"
+            android:layout_width="100dp"/>
+
+    </LinearLayout>
+</LinearLayout>

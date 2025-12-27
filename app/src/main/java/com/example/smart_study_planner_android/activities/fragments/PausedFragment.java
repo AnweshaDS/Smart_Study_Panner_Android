@@ -8,6 +8,7 @@ import android.widget.*;
 import androidx.fragment.app.Fragment;
 
 import com.example.smart_study_planner_android.R;
+import com.example.smart_study_planner_android.activities.adapters.TaskAdapter;
 import com.example.smart_study_planner_android.activities.database.TaskDAO;
 import com.example.smart_study_planner_android.activities.model.Task;
 
@@ -49,10 +50,6 @@ public class PausedFragment extends Fragment {
 
     private void load(ListView list) {
         tasks = dao.getTasksByStatus(TaskDAO.PAUSED);
-        list.setAdapter(new ArrayAdapter<>(
-                requireContext(),
-                android.R.layout.simple_list_item_1,
-                tasks.stream().map(Task::getTitle).toArray(String[]::new)
-        ));
+        list.setAdapter(new TaskAdapter(requireContext(), tasks));
     }
 }
