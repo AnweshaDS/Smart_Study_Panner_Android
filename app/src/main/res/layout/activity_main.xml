@@ -16,6 +16,39 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
         -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:weightSum="4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button android:id="@+id/btnTodo" android:text="To-Do"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+            <Button android:id="@+id/btnRunning" android:text="Running"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+            <Button android:id="@+id/btnPaused" android:text="Paused"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+            <Button android:id="@+id/btnCompleted" android:text="Completed"
+                android:layout_width="0dp" android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/fragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
