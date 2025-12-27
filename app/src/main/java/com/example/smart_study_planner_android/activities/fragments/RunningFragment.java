@@ -50,7 +50,7 @@ public class RunningFragment extends Fragment {
 
     private void load(ListView list) {
         tasks = dao.getTasksByStatus(TaskDAO.RUNNING);
-        list.setAdapter(new TaskAdapter(requireContext(), tasks));
+        list.setAdapter(new TaskAdapter(requireContext(), tasks,TaskDAO.RUNNING));
 
     }
 }

@@ -7,23 +7,27 @@
     android:layout_height="match_parent">
 
     <EditText android:id="@+id/etUsername"
-        android:hint="Username"
+        android:autofillHints="User Name"
+        android:hint="@string/username"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="48dp"
+        android:inputType="text" />
 
-    <EditText android:id="@+id/etPassword"
-        android:hint="Password"
-        android:inputType="textPassword"
+    <EditText
+        android:id="@+id/etPassword"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="48dp"
+        android:autofillHints="Password"
+        android:hint="@string/password"
+        android:inputType="textPassword" />
 
     <Button android:id="@+id/btnLogin"
-        android:text="Login"
+        android:text="@string/login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <Button android:id="@+id/btnSignup"
-        android:text="Signup"
+        android:text="@string/signup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 </LinearLayout>

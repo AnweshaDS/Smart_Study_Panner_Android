@@ -1,6 +1,7 @@
 package com.example.smart_study_planner_android.activities.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.*;
 import android.widget.Button;
 import android.widget.TextView;
@@ -8,6 +9,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smart_study_planner_android.R;
+import com.example.smart_study_planner_android.activities.PomodoroActivity;
 import com.example.smart_study_planner_android.activities.database.TaskDAO;
 import com.example.smart_study_planner_android.activities.model.Task;
 
@@ -66,30 +68,54 @@ public class TaskRecyclerAdapter
         Task t = tasks.get(pos);
         h.title.setText(t.getTitle());
 
-        if (h.btnStart != null)
+        // Start button
+        if (h.btnStart != null) {
             h.btnStart.setOnClickListener(v -> {
                 dao.updateStatus(t.getId(), TaskDAO.RUNNING);
-                refresh(dao.getTasksByStatus(status));
+                // Remove the task from current list after changing status
+                tasks.remove(pos);
+                notifyItemRemoved(pos);
             });
+        }
 
-        if (h.btnPause != null)
+        // Pause button
+        if (h.btnPause != null) {
             h.btnPause.setOnClickListener(v -> {
                 dao.updateStatus(t.getId(), TaskDAO.PAUSED);
-                refresh(dao.getTasksByStatus(status));
+                tasks.remove(pos);
+                notifyItemRemoved(pos);
             });
+        }
 
-        if (h.btnFinish != null)
+        // Finish button
+        if (h.btnFinish != null) {
             h.btnFinish.setOnClickListener(v -> {
                 dao.updateStatus(t.getId(), TaskDAO.COMPLETED);
-                refresh(dao.getTasksByStatus(status));
+                tasks.remove(pos);
+                notifyItemRemoved(pos);
             });
+        }
 
-        if (h.btnDelete != null)
+        // Delete button
+        if (h.btnDelete != null) {
             h.btnDelete.setOnClickListener(v -> {
                 dao.deleteTask(t.getId());
-                refresh(dao.getTasksByStatus(status));
+                tasks.remove(pos);
+                notifyItemRemoved(pos);
             });
+        }
 
+        // Item click for RUNNING tasks to open Pomodoro
+        if (status == TaskDAO.RUNNING) {
+            h.itemView.setOnClickListener(v -> {
+                Intent i = new Intent(v.getContext(), PomodoroActivity.class);
+                i.putExtra("task_id", t.getId());
+                i.putExtra("task_title", t.getTitle());
+                v.getContext().startActivity(i);
+            });
+        } else {
+            h.itemView.setOnClickListener(null);
+        }
     }
 
     @Override

@@ -1,15 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Smart_Study_planner_Android</string>
     <string name="delete">Delete</string>
     <string name="start">Start</string>
     <string name="pause">Pause</string>
     <string name="finish">Finish</string>
-    <string name="delete2">Delete</string>
     <string name="run">run</string>
-    <string name="delete3">delete3</string>
     <string name="enter_task">Enter task</string>
     <string name="add_task">Add Task</string>
     <string name="paused_tasks">Paused Tasks</string>
     <string name="running_tasks">Running Tasks</string>
     <string name="completed_tasks">Completed Tasks</string>
+    <string name="task_name">Task Name</string>
+    <string name="timer_25_00">25:00</string>
+    <string name="finish_task">Finish Task</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="signup">Signup</string>
 </resources>

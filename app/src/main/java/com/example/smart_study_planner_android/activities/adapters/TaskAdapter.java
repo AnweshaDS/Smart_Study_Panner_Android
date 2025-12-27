@@ -13,9 +13,9 @@ import java.util.List;
 public class TaskAdapter extends ArrayAdapter<Task> {
 
     private final TaskDAO dao;
-    private final int status;
+    private final int status ;
 
-    public TaskAdapter(Context ctx, List<Task> tasks) {
+    public TaskAdapter(Context ctx, List<Task> tasks, int status) {
         super(ctx, 0, tasks);
         this.dao = new TaskDAO(ctx);
         this.status = status;
@@ -27,12 +27,26 @@ public class TaskAdapter extends ArrayAdapter<Task> {
         Task t = getItem(pos);
 
         if (v == null) {
-            int layout = switch (status) {
-                case TaskDAO.TODO -> R.layout.item_task_todo;
-                case TaskDAO.RUNNING -> R.layout.item_task_running;
-                case TaskDAO.PAUSED -> R.layout.item_task_paused;
-                default -> R.layout.item_task_completed;
-            };
+            int layout;
+
+            switch (status) {
+                case TaskDAO.TODO:
+                    layout = R.layout.item_task_todo;
+                    break;
+
+                case TaskDAO.RUNNING:
+                    layout = R.layout.item_task_running;
+                    break;
+
+                case TaskDAO.PAUSED:
+                    layout = R.layout.item_task_paused;
+                    break;
+
+                case TaskDAO.COMPLETED:
+                default:
+                    layout = R.layout.item_task_completed;
+                    break;
+            }
             v = LayoutInflater.from(getContext()).inflate(layout, parent, false);
         }
 

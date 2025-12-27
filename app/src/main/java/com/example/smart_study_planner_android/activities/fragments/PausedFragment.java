@@ -50,6 +50,6 @@ public class PausedFragment extends Fragment {
 
     private void load(ListView list) {
         tasks = dao.getTasksByStatus(TaskDAO.PAUSED);
-        list.setAdapter(new TaskAdapter(requireContext(), tasks));
+        list.setAdapter(new TaskAdapter(requireContext(), tasks,TaskDAO.PAUSED));
     }
 }

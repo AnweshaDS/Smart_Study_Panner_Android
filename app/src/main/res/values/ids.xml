@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <item name="etTask" type="id">etTask</item>
-    <item name="btnAdd" type="id">btnAdd</item>
-    <item name="recyclerTasks" type="id">recyclerTasks</item>
-</resources>

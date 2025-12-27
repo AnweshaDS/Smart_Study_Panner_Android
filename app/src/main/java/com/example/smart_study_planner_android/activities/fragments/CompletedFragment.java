@@ -25,7 +25,7 @@ public class CompletedFragment extends Fragment {
         TaskDAO dao = new TaskDAO(requireContext());
 
         List<Task> tasks = dao.getTasksByStatus(TaskDAO.COMPLETED);
-        list.setAdapter(new TaskAdapter(requireContext(), tasks));
+        list.setAdapter(new TaskAdapter(requireContext(), tasks,TaskDAO.COMPLETED));
 
         return v;
     }

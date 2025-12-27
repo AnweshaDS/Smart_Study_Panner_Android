@@ -1,16 +1,20 @@
 package com.example.smart_study_planner_android.activities.fragments;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.EditText;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smart_study_planner_android.R;
-import com.example.smart_study_planner_android.activities.adapters.TaskAdapter;
+import com.example.smart_study_planner_android.activities.adapters.TaskRecyclerAdapter;
 import com.example.smart_study_planner_android.activities.database.TaskDAO;
 import com.example.smart_study_planner_android.activities.model.Task;
 
@@ -19,12 +23,16 @@ import java.util.List;
 public class TodoFragment extends Fragment {
 
     private TaskDAO dao;
-    private ArrayAdapter<String> adapter;
+    private TaskRecyclerAdapter adapter;
     private List<Task> tasks;
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState
+    ) {
 
         View v = inflater.inflate(R.layout.fragment_todo, container, false);
 
@@ -32,43 +40,27 @@ public class TodoFragment extends Fragment {
 
         EditText etTask = v.findViewById(R.id.etTask);
         Button btnAdd = v.findViewById(R.id.btnAdd);
-        ListView list = v.findViewById(R.id.listTasks);
+        RecyclerView recycler = v.findViewById(R.id.recyclerTasks);
 
-        loadTasks(list);
+        recycler.setLayoutManager(new LinearLayoutManager(requireContext()));
+        tasks = dao.getTasksByStatus(TaskDAO.TODO);
+        adapter = new TaskRecyclerAdapter(requireContext(), tasks, TaskDAO.TODO);
+        recycler.setAdapter(adapter);
 
         btnAdd.setOnClickListener(view -> {
             String title = etTask.getText().toString().trim();
             if (!title.isEmpty()) {
                 dao.addTask(new Task(title, TaskDAO.TODO));
                 etTask.setText("");
-                loadTasks(list);
+                refreshTasks();
             }
-        });
-
-        // Long press → Start task
-        list.setOnItemLongClickListener((parent, view, pos, id) -> {
-            Task t = tasks.get(pos);
-
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Start Task")
-                    .setMessage("Start this task?")
-                    .setPositiveButton("Start", (d, w) -> {
-                        dao.updateStatus(t.getId(), TaskDAO.RUNNING);
-                        loadTasks(list);
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .show();
-
-            return true;
         });
 
         return v;
     }
 
-    private void loadTasks(ListView list) {
+    private void refreshTasks() {
         tasks = dao.getTasksByStatus(TaskDAO.TODO);
-        list.setAdapter(new TaskAdapter(requireContext(), tasks));
-
-        list.setAdapter(adapter);
+        adapter.refresh(tasks);
     }
 }
