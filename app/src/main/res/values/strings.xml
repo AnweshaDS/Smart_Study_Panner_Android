@@ -7,4 +7,9 @@
     <string name="delete2">Delete</string>
     <string name="run">run</string>
     <string name="delete3">delete3</string>
+    <string name="enter_task">Enter task</string>
+    <string name="add_task">Add Task</string>
+    <string name="paused_tasks">Paused Tasks</string>
+    <string name="running_tasks">Running Tasks</string>
+    <string name="completed_tasks">Completed Tasks</string>
 </resources>

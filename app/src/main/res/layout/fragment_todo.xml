@@ -7,13 +7,13 @@
 
     <EditText
         android:id="@+id/etTask"
-        android:hint="Enter task"
+        android:hint="@string/enter_task"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <Button
         android:id="@+id/btnAdd"
-        android:text="Add Task"
+        android:text="@string/add_task"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"/>
@@ -24,9 +24,8 @@
         android:layout_marginVertical="12dp"
         android:background="#CCCCCC"/>
 
-
-    <ListView
-        android:id="@+id/listTasks"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerTasks"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"/>
