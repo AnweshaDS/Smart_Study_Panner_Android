@@ -18,9 +18,9 @@
         android:layout_marginVertical="12dp"
         android:background="#CCCCCC"/>
 
-    <ListView
-        android:id="@+id/listTasks"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerTasks"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_height="match_parent"/>
+
 </LinearLayout>

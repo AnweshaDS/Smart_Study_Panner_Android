@@ -6,9 +6,11 @@ import android.view.*;
 import android.widget.*;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smart_study_planner_android.R;
-import com.example.smart_study_planner_android.activities.adapters.TaskAdapter;
+import com.example.smart_study_planner_android.activities.adapters.TaskRecyclerAdapter;
 import com.example.smart_study_planner_android.activities.database.TaskDAO;
 import com.example.smart_study_planner_android.activities.model.Task;
 
@@ -17,7 +19,7 @@ import java.util.List;
 public class RunningFragment extends Fragment {
 
     private TaskDAO dao;
-    private List<Task> tasks;
+    private TaskRecyclerAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -26,31 +28,27 @@ public class RunningFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_running, container, false);
         dao = new TaskDAO(requireContext());
 
-        ListView list = v.findViewById(R.id.listTasks);
-        load(list);
+        RecyclerView recycler = v.findViewById(R.id.recyclerTasks);
+        if (recycler == null) {
+            throw new RuntimeException("RecyclerView not found in fragment layout");
+        }
 
-        list.setOnItemLongClickListener((p, view, pos, id) -> {
-            Task t = tasks.get(pos);
+        recycler.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-            String[] options = {"Pause", "Finish"};
-            new AlertDialog.Builder(requireContext())
-                    .setTitle(t.getTitle())
-                    .setItems(options, (d, which) -> {
-                        if (which == 0)
-                            dao.updateStatus(t.getId(), TaskDAO.PAUSED);
-                        else
-                            dao.updateStatus(t.getId(), TaskDAO.COMPLETED);
-                        load(list);
-                    }).show();
-            return true;
-        });
 
+        adapter = new TaskRecyclerAdapter(
+                requireContext(),
+                dao.getTasksByStatus(TaskDAO.RUNNING),
+                TaskDAO.RUNNING
+        );
+
+        recycler.setAdapter(adapter);
         return v;
     }
 
-    private void load(ListView list) {
-        tasks = dao.getTasksByStatus(TaskDAO.RUNNING);
-        list.setAdapter(new TaskAdapter(requireContext(), tasks,TaskDAO.RUNNING));
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        adapter.refresh(dao.getTasksByStatus(TaskDAO.RUNNING));
     }
 }

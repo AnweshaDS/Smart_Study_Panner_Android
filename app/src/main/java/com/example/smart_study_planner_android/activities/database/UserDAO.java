@@ -23,8 +23,7 @@ public class UserDAO extends SQLiteOpenHelper {
                 "CREATE TABLE users (" +
                         "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                         "username TEXT UNIQUE," +
-                        "password TEXT," +
-                        "email TEXT)"
+                        "password TEXT)"
         );
     }
 
@@ -34,41 +33,35 @@ public class UserDAO extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // SIGNUP
-    public boolean register(User user) {
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("username", user.getUsername());
-        cv.put("password", user.getPassword());
-        cv.put("email", user.getEmail());
-
-        long result = db.insert("users", null, cv);
-        db.close();
-        return result != -1;
-    }
-
-    // LOGIN
     public User login(String username, String password) {
         SQLiteDatabase db = getReadableDatabase();
+
         Cursor c = db.rawQuery(
                 "SELECT * FROM users WHERE username=? AND password=?",
                 new String[]{username, password}
         );
 
+        User user = null;
         if (c.moveToFirst()) {
-            User user = new User(
-                    c.getInt(0),
+            user = new User(
+                    c.getString(0),
                     c.getString(1),
-                    c.getString(2),
-                    c.getString(3)
+                    c.getString(2)
             );
-            c.close();
-            db.close();
-            return user;
         }
 
         c.close();
         db.close();
-        return null;
+        return user;
+    }
+
+    public boolean signup(User user) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("username", user.getUsername());
+        cv.put("password", user.getPassword());
+        db.insert("users", null, cv);
+        db.close();
+        return false;
     }
 }

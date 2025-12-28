@@ -26,7 +26,7 @@ public class SignupActivity extends AppCompatActivity {
         UserDAO dao = new UserDAO(this);
 
         btnRegister.setOnClickListener(v -> {
-            boolean success = dao.register(
+            boolean success = dao.signup(
                     new User(
                             username.getText().toString(),
                             password.getText().toString(),

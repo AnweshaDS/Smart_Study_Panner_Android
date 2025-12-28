@@ -29,7 +29,13 @@ public class TaskDAO {
                 "CREATE TABLE IF NOT EXISTS tasks (" +
                         "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                         "title TEXT," +
-                        "status INTEGER)"
+                        "status INTEGER," +
+                        "targetSeconds INTEGER," +
+                        "studySeconds INTEGER," +
+                        "breakSeconds INTEGER," +
+                        "spentSeconds INTEGER," +
+                        "lastStartTime INTEGER)"
+
         );
         db.close();
     }
@@ -37,8 +43,15 @@ public class TaskDAO {
     public void addTask(Task task) {
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues cv = new ContentValues();
+
         cv.put("title", task.getTitle());
         cv.put("status", task.getStatus());
+        cv.put("targetSeconds", task.getTargetSeconds());
+        cv.put("studySeconds", task.getStudySeconds());
+        cv.put("breakSeconds", task.getBreakSeconds());
+        cv.put("spentSeconds", task.getSpentSeconds());
+        cv.put("lastStartTime", task.getLastStartTime());
+
         db.insert("tasks", null, cv);
         db.close();
     }
@@ -54,11 +67,17 @@ public class TaskDAO {
 
         while (c.moveToNext()) {
             list.add(new Task(
-                    c.getInt(0),
-                    c.getString(1),
-                    c.getInt(2)
+                    c.getInt(0),      // id
+                    c.getString(1),   // title
+                    c.getInt(2),      // status
+                    c.getLong(3),     // targetSeconds
+                    c.getLong(4),     // studySeconds
+                    c.getLong(5),     // breakSeconds
+                    c.getLong(6),     // spentSeconds
+                    c.getLong(7)      // lastStartTime
             ));
         }
+
 
         c.close();
         db.close();

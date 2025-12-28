@@ -41,6 +41,10 @@ public class TodoFragment extends Fragment {
         EditText etTask = v.findViewById(R.id.etTask);
         Button btnAdd = v.findViewById(R.id.btnAdd);
         RecyclerView recycler = v.findViewById(R.id.recyclerTasks);
+        if (recycler == null) {
+            throw new RuntimeException("RecyclerView not found in fragment layout");
+        }
+
 
         recycler.setLayoutManager(new LinearLayoutManager(requireContext()));
         tasks = dao.getTasksByStatus(TaskDAO.TODO);
@@ -50,7 +54,17 @@ public class TodoFragment extends Fragment {
         btnAdd.setOnClickListener(view -> {
             String title = etTask.getText().toString().trim();
             if (!title.isEmpty()) {
-                dao.addTask(new Task(title, TaskDAO.TODO));
+                dao.addTask(new Task(
+                        0,                 // id (auto-generated)
+                        title,             // title
+                        TaskDAO.TODO,      // status
+                        3600,              // targetSeconds (1 hour default)
+                        1500,              // studySeconds (25 min default)
+                        300,               // breakSeconds (5 min default)
+                        0,                 // spentSeconds
+                        0                  // lastStartTime
+                ));
+
                 etTask.setText("");
                 refreshTasks();
             }
@@ -59,8 +73,15 @@ public class TodoFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshTasks();
+    }
     private void refreshTasks() {
         tasks = dao.getTasksByStatus(TaskDAO.TODO);
         adapter.refresh(tasks);
     }
+
+
 }

@@ -30,6 +30,7 @@ public class LauncherActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(v -> {
 
             startActivity(new Intent(LauncherActivity.this, LoginActivity.class));
+            finish();
         });
 
         btnExit.setOnClickListener(v -> {
