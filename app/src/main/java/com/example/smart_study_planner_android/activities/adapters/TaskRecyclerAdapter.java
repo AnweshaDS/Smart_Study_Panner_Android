@@ -71,8 +71,17 @@ public class TaskRecyclerAdapter
         // Start button
         if (h.btnStart != null) {
             h.btnStart.setOnClickListener(v -> {
+
+                // Update status
                 dao.updateStatus(t.getId(), TaskDAO.RUNNING);
-                // Remove the task from current list after changing status
+
+                // Open Pomodoro
+                Intent i = new Intent(v.getContext(), PomodoroActivity.class);
+                i.putExtra("task_id", t.getId());
+                i.putExtra("task_title", t.getTitle());
+                v.getContext().startActivity(i);
+
+                //  Remove from current list
                 tasks.remove(pos);
                 notifyItemRemoved(pos);
             });
