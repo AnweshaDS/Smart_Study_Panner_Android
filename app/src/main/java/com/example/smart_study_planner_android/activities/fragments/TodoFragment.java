@@ -76,14 +76,15 @@ public class TodoFragment extends Fragment {
         return v;
     }
 
+    private void refreshTasks() {
+        tasks = dao.getTasksByStatus(TaskDAO.TODO);
+        adapter.refresh(tasks);
+    }
+
     @Override
     public void onResume() {
         super.onResume();
         refreshTasks();
-    }
-    private void refreshTasks() {
-        tasks = dao.getTasksByStatus(TaskDAO.TODO);
-        adapter.refresh(tasks);
     }
 
 

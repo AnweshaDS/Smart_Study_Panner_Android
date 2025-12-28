@@ -46,13 +46,13 @@ public class CompletedFragment extends Fragment {
     }
 
     private void refreshTasks() {
-        adapter.refresh(dao.getTasksByStatus(TaskDAO.RUNNING));
+        adapter.refresh(dao.getTasksByStatus(TaskDAO.COMPLETED));
     }
 
 
     @Override
     public void onResume() {
         super.onResume();
-        refreshTasks();
+        adapter.refresh(dao.getTasksByStatus(TaskDAO.COMPLETED));
     }
 }
