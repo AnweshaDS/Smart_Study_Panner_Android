@@ -22,11 +22,19 @@ public class TaskRecyclerAdapter
     private final TaskDAO dao;
     private final int status;
 
-    public TaskRecyclerAdapter(Context ctx, List<Task> tasks, int status) {
+    private final TaskActionListener listener;
+
+
+    public TaskRecyclerAdapter(Context ctx,
+                               List<Task> tasks,
+                               int status,
+                               TaskActionListener listener) {
         this.tasks = tasks;
         this.dao = new TaskDAO(ctx);
         this.status = status;
+        this.listener = listener;
     }
+
 
     public void refresh(List<Task> newTasks) {
         this.tasks = newTasks;
@@ -82,8 +90,8 @@ public class TaskRecyclerAdapter
                 v.getContext().startActivity(i);
 
                 //  Remove from current list
-                tasks.remove(pos);
-                notifyItemRemoved(pos);
+                listener.onTaskChanged();
+
             });
         }
 
@@ -91,8 +99,8 @@ public class TaskRecyclerAdapter
         if (h.btnPause != null) {
             h.btnPause.setOnClickListener(v -> {
                 dao.updateStatus(t.getId(), TaskDAO.PAUSED);
-                tasks.remove(pos);
-                notifyItemRemoved(pos);
+                listener.onTaskChanged();
+
             });
         }
 
@@ -100,8 +108,8 @@ public class TaskRecyclerAdapter
         if (h.btnFinish != null) {
             h.btnFinish.setOnClickListener(v -> {
                 dao.updateStatus(t.getId(), TaskDAO.COMPLETED);
-                tasks.remove(pos);
-                notifyItemRemoved(pos);
+                listener.onTaskChanged();
+
             });
         }
 
@@ -109,8 +117,7 @@ public class TaskRecyclerAdapter
         if (h.btnDelete != null) {
             h.btnDelete.setOnClickListener(v -> {
                 dao.deleteTask(t.getId());
-                tasks.remove(pos);
-                notifyItemRemoved(pos);
+                listener.onTaskChanged();
             });
         }
 

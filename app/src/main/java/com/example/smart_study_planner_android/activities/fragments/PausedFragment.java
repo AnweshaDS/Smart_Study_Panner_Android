@@ -38,16 +38,22 @@ public class PausedFragment extends Fragment {
         adapter = new TaskRecyclerAdapter(
                 requireContext(),
                 dao.getTasksByStatus(TaskDAO.PAUSED),
-                TaskDAO.PAUSED
+                TaskDAO.PAUSED,
+                this::refreshTasks
         );
 
         recycler.setAdapter(adapter);
         return v;
     }
 
+    private void refreshTasks() {
+        adapter.refresh(dao.getTasksByStatus(TaskDAO.PAUSED));
+    }
+
+
     @Override
     public void onResume() {
         super.onResume();
-        adapter.refresh(dao.getTasksByStatus(TaskDAO.PAUSED));
+        refreshTasks();
     }
 }

@@ -23,7 +23,8 @@ public class UserDAO extends SQLiteOpenHelper {
                 "CREATE TABLE users (" +
                         "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                         "username TEXT UNIQUE," +
-                        "password TEXT)"
+                        "password TEXT," +
+                        "email TEXT)"
         );
     }
 
@@ -44,10 +45,12 @@ public class UserDAO extends SQLiteOpenHelper {
         User user = null;
         if (c.moveToFirst()) {
             user = new User(
-                    c.getString(0),
-                    c.getString(1),
-                    c.getString(2)
+                    c.getInt(0),      // id
+                    c.getString(1),   // username
+                    c.getString(2),   // password
+                    c.getString(3)    // email
             );
+
         }
 
         c.close();
@@ -60,8 +63,12 @@ public class UserDAO extends SQLiteOpenHelper {
         ContentValues cv = new ContentValues();
         cv.put("username", user.getUsername());
         cv.put("password", user.getPassword());
-        db.insert("users", null, cv);
+        cv.put("email", user.getEmail());
+
+        long result = db.insert("users", null, cv);
         db.close();
-        return false;
+
+        return result != -1;
     }
+
 }

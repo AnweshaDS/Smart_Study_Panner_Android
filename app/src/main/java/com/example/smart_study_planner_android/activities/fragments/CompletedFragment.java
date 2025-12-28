@@ -37,16 +37,22 @@ public class CompletedFragment extends Fragment {
         adapter = new TaskRecyclerAdapter(
                 requireContext(),
                 dao.getTasksByStatus(TaskDAO.COMPLETED),
-                TaskDAO.COMPLETED
+                TaskDAO.COMPLETED,
+                this::refreshTasks
         );
 
         recycler.setAdapter(adapter);
         return v;
     }
 
+    private void refreshTasks() {
+        adapter.refresh(dao.getTasksByStatus(TaskDAO.RUNNING));
+    }
+
+
     @Override
     public void onResume() {
         super.onResume();
-        adapter.refresh(dao.getTasksByStatus(TaskDAO.COMPLETED));
+        refreshTasks();
     }
 }

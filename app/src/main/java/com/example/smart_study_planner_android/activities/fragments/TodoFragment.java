@@ -48,7 +48,10 @@ public class TodoFragment extends Fragment {
 
         recycler.setLayoutManager(new LinearLayoutManager(requireContext()));
         tasks = dao.getTasksByStatus(TaskDAO.TODO);
-        adapter = new TaskRecyclerAdapter(requireContext(), tasks, TaskDAO.TODO);
+        adapter = new TaskRecyclerAdapter(requireContext(),
+                tasks,
+                TaskDAO.TODO,
+                this::refreshTasks);
         recycler.setAdapter(adapter);
 
         btnAdd.setOnClickListener(view -> {
