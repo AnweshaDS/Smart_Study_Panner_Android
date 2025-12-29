@@ -30,7 +30,7 @@
         android:layout_height="wrap_content">
 
         <Button
-            android:id="@+id/btnRun"
+            android:id="@+id/btnStart"
             style="?android:attr/buttonBarButtonStyle"
             android:text="@string/run"
             android:layout_height="60dp"

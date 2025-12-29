@@ -16,8 +16,7 @@ public class PomodoroActivity extends AppCompatActivity {
     TaskDAO dao;
     Task task;
 
-    long studyTime;
-    long breakTime;
+    long studyTimeMs;
 
 
     private CountDownTimer timer;
@@ -34,7 +33,7 @@ public class PomodoroActivity extends AppCompatActivity {
         task.setSpentSeconds(task.getSpentSeconds() + deltaSeconds);
         dao.updateSpentTime(task.getId(), task.getSpentSeconds());
 
-        sessionStartTime = now; // reset for next session
+        sessionStartTime = now; // reset
     }
 
 
@@ -55,9 +54,7 @@ public class PomodoroActivity extends AppCompatActivity {
             finish();
             return;
         }
-
-        studyTime = task.getStudySeconds() * 1000; // seconds → millis
-        breakTime = task.getBreakSeconds() * 1000;
+        studyTimeMs = task.getStudySeconds() * 1000;
         sessionStartTime = System.currentTimeMillis();
 
 
@@ -66,7 +63,9 @@ public class PomodoroActivity extends AppCompatActivity {
 
         tvTask.setText(title);
 
-        startTimer(studyTime, tvTimer);
+        startTimer(studyTimeMs, tvTimer);
+        task.setLastStartTime(System.currentTimeMillis());
+
 
 
         btnPause.setOnClickListener(v -> {
@@ -91,32 +90,45 @@ public class PomodoroActivity extends AppCompatActivity {
 
     private void startTimer(long millis, TextView tv) {
         timer = new CountDownTimer(millis, 1000) {
+
             public void onTick(long ms) {
                 tv.setText(format(ms));
             }
+
             public void onFinish() {
+                saveSpentTime();
+
                 if (isStudyPhase) {
+                    // switch to BREAK
                     isStudyPhase = false;
-                    startTimer(breakTime, tv);
-                    tv.setText("Break!");
+                    startTimer(task.getBreakSeconds() * 1000, tv);
+                    tv.setText("Break");
                 } else {
-                    tv.setText("Session Complete!");
+                    // session fully done
                     dao.updateStatus(taskId, TaskDAO.COMPLETED);
+                    finish();
                 }
             }
 
         }.start();
     }
 
+
     private String format(long ms) {
-        int m = (int) (ms / 60000);
-        int s = (int) ((ms % 60000) / 1000);
-        return String.format("%02d:%02d", m, s);
+        long totalSec = ms / 1000;
+        long h = totalSec / 3600;
+        long m = (totalSec % 3600) / 60;
+        long s = totalSec % 60;
+        return String.format("%02d:%02d:%02d", h, m, s);
     }
+
 
     private long parseTime(String t) {
         String[] p = t.split(":");
-        return (Integer.parseInt(p[0]) * 60L +
-                Integer.parseInt(p[1])) * 1000;
+        long sec = Integer.parseInt(p[0]) * 3600L
+                + Integer.parseInt(p[1]) * 60L
+                + Integer.parseInt(p[2]);
+        return sec * 1000;
     }
+
 }

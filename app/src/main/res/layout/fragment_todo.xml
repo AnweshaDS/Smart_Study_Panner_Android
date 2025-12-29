@@ -13,22 +13,22 @@
 
     <EditText
         android:id="@+id/etTargetMinutes"
-        android:hint="@string/target_minutes"
-        android:inputType="number"
+        android:inputType="text"
+        android:hint="HH:MM:SS"
         android:layout_width="match_parent"
         android:layout_height="48dp"/>
 
     <EditText
         android:id="@+id/etStudyMinutes"
-        android:hint="@string/study_minutes"
-        android:inputType="number"
+        android:inputType="text"
+        android:hint="HH:MM:SS"
         android:layout_width="match_parent"
         android:layout_height="48dp"/>
 
     <EditText
         android:id="@+id/etBreakMinutes"
-        android:hint="@string/break_minutes"
-        android:inputType="number"
+        android:inputType="text"
+        android:hint="HH:MM:SS"
         android:layout_width="match_parent"
         android:layout_height="48dp"/>
 

@@ -13,6 +13,27 @@ public class Task {
     private long spentSeconds;
     private long lastStartTime;
 
+    public static String formatSeconds(long sec) {
+        long h = sec / 3600;
+        long m = (sec % 3600) / 60;
+        long s = sec % 60;
+        return String.format("%02d:%02d:%02d", h, m, s);
+    }
+
+    public String getSpentTimeFormatted() {
+        return formatSeconds(spentSeconds);
+    }
+
+    public String getRemainingTimeFormatted() {
+        long remaining = Math.max(0, targetSeconds - spentSeconds);
+        return formatSeconds(remaining);
+    }
+
+    public String getStudyTimeFormatted() {
+        return formatSeconds(studySeconds);
+    }
+
+
     public Task(int id, String title, int status,
                 long targetSeconds, long studySeconds,
                 long breakSeconds, long spentSeconds,

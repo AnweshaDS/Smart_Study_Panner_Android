@@ -71,21 +71,18 @@ public class TaskRecyclerAdapter
     public void onBindViewHolder(ViewHolder h, int pos) {
         Task t = tasks.get(pos);
 
-        // TITLE
         if (h.title != null) {
             h.title.setText(t.getTitle());
         }
 
-        // TIME INFO (safe & dynamic)
         if (h.timeInfo != null) {
-            long spentMin = t.getSpentSeconds() / 60;
-            long remainingMin =
-                    Math.max(0, (t.getTargetSeconds() - t.getSpentSeconds()) / 60);
-
             h.timeInfo.setText(
-                    "Spent: " + spentMin + " min | Left: " + remainingMin + " min"
+                    "Spent: " + t.getSpentTimeFormatted()
+                            + " | Remaining: " + t.getRemainingTimeFormatted()
             );
         }
+
+
 
         // START
         if (h.btnStart != null) {

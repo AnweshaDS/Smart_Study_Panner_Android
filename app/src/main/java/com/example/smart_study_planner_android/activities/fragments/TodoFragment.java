@@ -26,8 +26,18 @@ public class TodoFragment extends Fragment {
     private TaskRecyclerAdapter adapter;
     private List<Task> tasks;
 
+    private long parseHMS(String time) {
+        String[] p = time.split(":");
+        if (p.length != 3) return 0;
+        return Integer.parseInt(p[0]) * 3600L
+                + Integer.parseInt(p[1]) * 60L
+                + Integer.parseInt(p[2]);
+    }
+
+
     @Nullable
     @Override
+
     public View onCreateView(
             @NonNull LayoutInflater inflater,
             @Nullable ViewGroup container,
@@ -60,9 +70,9 @@ public class TodoFragment extends Fragment {
         btnAdd.setOnClickListener(view -> {
             String title = etTask.getText().toString().trim();
             if (!title.isEmpty()) {
-                long targetSec = Long.parseLong(etTarget.getText().toString()) * 60;
-                long studySec = Long.parseLong(etStudy.getText().toString()) * 60;
-                long breakSec = Long.parseLong(etBreak.getText().toString()) * 60;
+                long targetSec = parseHMS(etTarget.getText().toString());
+                long studySec  = parseHMS(etStudy.getText().toString());
+                long breakSec  = parseHMS(etBreak.getText().toString());
 
                 Task task = new Task(
                         0,
