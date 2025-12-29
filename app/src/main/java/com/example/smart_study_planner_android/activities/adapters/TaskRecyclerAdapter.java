@@ -90,6 +90,7 @@ public class TaskRecyclerAdapter
         // START
         if (h.btnStart != null) {
             h.btnStart.setOnClickListener(v -> {
+                h.btnStart.setEnabled(false);
                 dao.updateStatus(t.getId(), TaskDAO.RUNNING);
 
                 Intent i = new Intent(v.getContext(), PomodoroActivity.class);
@@ -98,7 +99,8 @@ public class TaskRecyclerAdapter
                 v.getContext().startActivity(i);
 
                 if (listener != null) {
-                    listener.onTaskChanged();
+                    v.post(listener::onTaskChanged);
+
                 }
 
             });
@@ -109,7 +111,8 @@ public class TaskRecyclerAdapter
             h.btnPause.setOnClickListener(v -> {
                 dao.updateStatus(t.getId(), TaskDAO.PAUSED);
                 if (listener != null) {
-                    listener.onTaskChanged();
+                    v.post(listener::onTaskChanged);
+
                 }
 
             });
@@ -120,7 +123,8 @@ public class TaskRecyclerAdapter
             h.btnFinish.setOnClickListener(v -> {
                 dao.updateStatus(t.getId(), TaskDAO.COMPLETED);
                 if (listener != null) {
-                    listener.onTaskChanged();
+                    v.post(listener::onTaskChanged);
+
                 }
 
             });
@@ -134,7 +138,8 @@ public class TaskRecyclerAdapter
                         "Task deleted",
                         Toast.LENGTH_SHORT).show();
                 if (listener != null) {
-                    listener.onTaskChanged();
+                    v.post(listener::onTaskChanged);
+
                 }
 
             });

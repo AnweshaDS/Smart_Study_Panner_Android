@@ -23,6 +23,20 @@ public class PomodoroActivity extends AppCompatActivity {
     private CountDownTimer timer;
     private boolean isRunning = true;
     private int taskId;
+    private long sessionStartTime;
+    private boolean isStudyPhase = true;
+
+
+    private void saveSpentTime() {
+        long now = System.currentTimeMillis();
+        long deltaSeconds = (now - sessionStartTime) / 1000;
+
+        task.setSpentSeconds(task.getSpentSeconds() + deltaSeconds);
+        dao.updateSpentTime(task.getId(), task.getSpentSeconds());
+
+        sessionStartTime = now; // reset for next session
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +58,9 @@ public class PomodoroActivity extends AppCompatActivity {
 
         studyTime = task.getStudySeconds() * 1000; // seconds → millis
         breakTime = task.getBreakSeconds() * 1000;
+        sessionStartTime = System.currentTimeMillis();
+
+
 
         String title = getIntent().getStringExtra("task_title");
 
@@ -52,12 +69,13 @@ public class PomodoroActivity extends AppCompatActivity {
         startTimer(studyTime, tvTimer);
 
 
-
         btnPause.setOnClickListener(v -> {
             if (isRunning) {
                 timer.cancel();
+                saveSpentTime();
                 btnPause.setText("Resume");
             } else {
+                sessionStartTime = System.currentTimeMillis();
                 startTimer(parseTime(tvTimer.getText().toString()), tvTimer);
                 btnPause.setText("Pause");
             }
@@ -65,6 +83,7 @@ public class PomodoroActivity extends AppCompatActivity {
         });
 
         btnFinish.setOnClickListener(v -> {
+            saveSpentTime();
             new TaskDAO(this).updateStatus(taskId, TaskDAO.COMPLETED);
             finish();
         });
@@ -76,8 +95,16 @@ public class PomodoroActivity extends AppCompatActivity {
                 tv.setText(format(ms));
             }
             public void onFinish() {
-                tv.setText("Done!");
+                if (isStudyPhase) {
+                    isStudyPhase = false;
+                    startTimer(breakTime, tv);
+                    tv.setText("Break!");
+                } else {
+                    tv.setText("Session Complete!");
+                    dao.updateStatus(taskId, TaskDAO.COMPLETED);
+                }
             }
+
         }.start();
     }
 
