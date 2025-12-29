@@ -2,7 +2,9 @@ package com.example.smart_study_planner_android.activities.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -68,7 +70,22 @@ public class TaskRecyclerAdapter
     @Override
     public void onBindViewHolder(ViewHolder h, int pos) {
         Task t = tasks.get(pos);
-        h.title.setText(t.getTitle());
+
+        // TITLE
+        if (h.title != null) {
+            h.title.setText(t.getTitle());
+        }
+
+        // TIME INFO (safe & dynamic)
+        if (h.timeInfo != null) {
+            long spentMin = t.getSpentSeconds() / 60;
+            long remainingMin =
+                    Math.max(0, (t.getTargetSeconds() - t.getSpentSeconds()) / 60);
+
+            h.timeInfo.setText(
+                    "Spent: " + spentMin + " min | Left: " + remainingMin + " min"
+            );
+        }
 
         // START
         if (h.btnStart != null) {
@@ -80,7 +97,10 @@ public class TaskRecyclerAdapter
                 i.putExtra("task_title", t.getTitle());
                 v.getContext().startActivity(i);
 
-                listener.onTaskChanged();
+                if (listener != null) {
+                    listener.onTaskChanged();
+                }
+
             });
         }
 
@@ -88,7 +108,10 @@ public class TaskRecyclerAdapter
         if (h.btnPause != null) {
             h.btnPause.setOnClickListener(v -> {
                 dao.updateStatus(t.getId(), TaskDAO.PAUSED);
-                listener.onTaskChanged();
+                if (listener != null) {
+                    listener.onTaskChanged();
+                }
+
             });
         }
 
@@ -96,7 +119,10 @@ public class TaskRecyclerAdapter
         if (h.btnFinish != null) {
             h.btnFinish.setOnClickListener(v -> {
                 dao.updateStatus(t.getId(), TaskDAO.COMPLETED);
-                listener.onTaskChanged();
+                if (listener != null) {
+                    listener.onTaskChanged();
+                }
+
             });
         }
 
@@ -107,11 +133,14 @@ public class TaskRecyclerAdapter
                 Toast.makeText(v.getContext(),
                         "Task deleted",
                         Toast.LENGTH_SHORT).show();
-                listener.onTaskChanged();
+                if (listener != null) {
+                    listener.onTaskChanged();
+                }
+
             });
         }
 
-        // RUNNING click → Pomodoro
+        // RUNNING → open Pomodoro
         if (status == TaskDAO.RUNNING) {
             h.itemView.setOnClickListener(v -> {
                 Intent i = new Intent(v.getContext(), PomodoroActivity.class);
@@ -130,12 +159,17 @@ public class TaskRecyclerAdapter
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
+
         TextView title;
+        TextView timeInfo;
+
         Button btnStart, btnPause, btnFinish, btnDelete;
 
         ViewHolder(View v) {
             super(v);
             title = v.findViewById(R.id.tvTitle);
+            timeInfo = v.findViewById(R.id.tvTimeInfo);
+
             btnStart = v.findViewById(R.id.btnStart);
             btnPause = v.findViewById(R.id.btnPause);
             btnFinish = v.findViewById(R.id.btnFinish);

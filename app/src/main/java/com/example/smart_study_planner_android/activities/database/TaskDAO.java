@@ -84,6 +84,42 @@ public class TaskDAO {
         return list;
     }
 
+    public Task getTaskById(int id) {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor c = db.rawQuery(
+                "SELECT * FROM tasks WHERE id=?",
+                new String[]{String.valueOf(id)}
+        );
+
+        Task t = null;
+        if (c.moveToFirst()) {
+            t = new Task(
+                    c.getInt(0),
+                    c.getString(1),
+                    c.getInt(2),
+                    c.getLong(3),
+                    c.getLong(4),
+                    c.getLong(5),
+                    c.getLong(6),
+                    c.getLong(7)
+            );
+        }
+
+        c.close();
+        db.close();
+        return t;
+    }
+
+    public void updateSpentTime(int id, long spent) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("spentSeconds", spent);
+        db.update("tasks", cv, "id=?", new String[]{String.valueOf(id)});
+        db.close();
+    }
+
+
+
     public void updateStatus(int taskId, int newStatus) {
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues cv = new ContentValues();

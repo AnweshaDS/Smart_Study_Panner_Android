@@ -9,10 +9,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.smart_study_planner_android.R;
 import com.example.smart_study_planner_android.activities.database.TaskDAO;
+import com.example.smart_study_planner_android.activities.model.Task;
+
 
 public class PomodoroActivity extends AppCompatActivity {
+    TaskDAO dao;
+    Task task;
 
-    private static final long STUDY_TIME = 25 * 60 * 1000; // 25 min
+    long studyTime;
+    long breakTime;
+
 
     private CountDownTimer timer;
     private boolean isRunning = true;
@@ -28,12 +34,24 @@ public class PomodoroActivity extends AppCompatActivity {
         Button btnPause = findViewById(R.id.btnPause);
         Button btnFinish = findViewById(R.id.btnFinish);
 
+        dao = new TaskDAO(this);
         taskId = getIntent().getIntExtra("task_id", -1);
+        task = dao.getTaskById(taskId);
+        if (task == null) {
+            finish();
+            return;
+        }
+
+        studyTime = task.getStudySeconds() * 1000; // seconds → millis
+        breakTime = task.getBreakSeconds() * 1000;
+
         String title = getIntent().getStringExtra("task_title");
 
         tvTask.setText(title);
 
-        startTimer(STUDY_TIME, tvTimer);
+        startTimer(studyTime, tvTimer);
+
+
 
         btnPause.setOnClickListener(v -> {
             if (isRunning) {

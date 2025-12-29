@@ -39,6 +39,9 @@ public class TodoFragment extends Fragment {
         dao = new TaskDAO(requireContext());
 
         EditText etTask = v.findViewById(R.id.etTask);
+        EditText etTarget = v.findViewById(R.id.etTargetMinutes);
+        EditText etStudy = v.findViewById(R.id.etStudyMinutes);
+        EditText etBreak = v.findViewById(R.id.etBreakMinutes);
         Button btnAdd = v.findViewById(R.id.btnAdd);
         RecyclerView recycler = v.findViewById(R.id.recyclerTasks);
         if (recycler == null) {
@@ -57,16 +60,22 @@ public class TodoFragment extends Fragment {
         btnAdd.setOnClickListener(view -> {
             String title = etTask.getText().toString().trim();
             if (!title.isEmpty()) {
-                dao.addTask(new Task(
-                        0,                 // id (auto-generated)
-                        title,             // title
-                        TaskDAO.TODO,      // status
-                        3600,              // targetSeconds (1 hour default)
-                        1500,              // studySeconds (25 min default)
-                        300,               // breakSeconds (5 min default)
-                        0,                 // spentSeconds
-                        0                  // lastStartTime
-                ));
+                long targetSec = Long.parseLong(etTarget.getText().toString()) * 60;
+                long studySec = Long.parseLong(etStudy.getText().toString()) * 60;
+                long breakSec = Long.parseLong(etBreak.getText().toString()) * 60;
+
+                Task task = new Task(
+                        0,
+                        title,
+                        TaskDAO.TODO,
+                        targetSec,
+                        studySec,
+                        breakSec,
+                        0,
+                        0
+                );
+
+                dao.addTask(task);
 
                 etTask.setText("");
                 refreshTasks();
