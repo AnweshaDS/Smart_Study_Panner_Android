@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,12 +20,24 @@ import com.example.smart_study_planner_android.activities.database.TaskDAO;
 import com.example.smart_study_planner_android.activities.model.Task;
 
 import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 
 public class TodoFragment extends Fragment {
 
     private TaskDAO dao;
     private TaskRecyclerAdapter adapter;
     private List<Task> tasks;
+    private TextView tvDailyTotal;
+
+
+    private String today() {
+        return new SimpleDateFormat("yyyy-MM-dd", Locale.US)
+                .format(new Date());
+    }
+
 
     private long parseHMS(String time) {
         String[] p = time.split(":");
@@ -48,6 +61,7 @@ public class TodoFragment extends Fragment {
 
         dao = new TaskDAO(requireContext());
 
+        tvDailyTotal = v.findViewById(R.id.tvDailyTotal);
         EditText etTask = v.findViewById(R.id.etTask);
         EditText etTarget = v.findViewById(R.id.etTargetMinutes);
         EditText etStudy = v.findViewById(R.id.etStudyMinutes);
@@ -82,7 +96,9 @@ public class TodoFragment extends Fragment {
                         studySec,
                         breakSec,
                         0,
-                        0
+                        0,
+                        0,
+                        today()
                 );
 
                 dao.addTask(task);
@@ -95,9 +111,21 @@ public class TodoFragment extends Fragment {
         return v;
     }
 
+
+    private String format(long sec) {
+        long h = sec / 3600;
+        long m = (sec % 3600) / 60;
+        long s = sec % 60;
+        return String.format("%02d:%02d:%02d", h, m, s);
+    }
+
+
     private void refreshTasks() {
         tasks = dao.getTasksByStatus(TaskDAO.TODO);
         adapter.refresh(tasks);
+
+        long total = dao.getTodayTotalSeconds();
+        tvDailyTotal.setText("Today: " + format(total));
     }
 
     @Override

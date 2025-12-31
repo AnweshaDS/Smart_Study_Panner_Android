@@ -5,6 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/tvDailyTotal"
+        android:text="Today: 00:00:00"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
     <EditText
         android:id="@+id/etTask"
         android:hint="@string/enter_task"

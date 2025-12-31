@@ -12,6 +12,9 @@ public class Task {
 
     private long spentSeconds;
     private long lastStartTime;
+    private long todaySpentSeconds;
+    private String lastStudyDate; // format: yyyy-MM-dd
+
 
     public static String formatSeconds(long sec) {
         long h = sec / 3600;
@@ -37,7 +40,8 @@ public class Task {
     public Task(int id, String title, int status,
                 long targetSeconds, long studySeconds,
                 long breakSeconds, long spentSeconds,
-                long lastStartTime) {
+                long lastStartTime,long todaySpentSeconds,
+                String lastStudyDate) {
 
         this.id = id;
         this.title = title;
@@ -47,6 +51,8 @@ public class Task {
         this.breakSeconds = breakSeconds;
         this.spentSeconds = spentSeconds;
         this.lastStartTime = lastStartTime;
+        this.todaySpentSeconds = todaySpentSeconds ;
+        this.lastStudyDate = lastStudyDate;
     }
 
     // getters & setters
@@ -114,4 +120,20 @@ public class Task {
     public void setLastStartTime(long lastStartTime) {
         this.lastStartTime = lastStartTime;
     }
+    public long getTodaySpentSeconds() {
+        return todaySpentSeconds;
+    }
+
+    public void setTodaySpentSeconds(long todaySpentSeconds) {
+        this.todaySpentSeconds = todaySpentSeconds;
+    }
+
+    public String getLastStudyDate() {
+        return lastStudyDate;
+    }
+
+    public void setLastStudyDate(String lastStudyDate) {
+        this.lastStudyDate = lastStudyDate;
+    }
+
 }

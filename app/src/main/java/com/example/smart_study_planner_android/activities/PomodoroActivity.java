@@ -11,31 +11,48 @@ import com.example.smart_study_planner_android.R;
 import com.example.smart_study_planner_android.activities.database.TaskDAO;
 import com.example.smart_study_planner_android.activities.model.Task;
 
-
 public class PomodoroActivity extends AppCompatActivity {
-    TaskDAO dao;
-    Task task;
 
-    long studyTimeMs;
+    private TaskDAO dao;
+    private Task task;
 
+    private long studyTimeMs;
+    private long breakTimeMs;
 
     private CountDownTimer timer;
     private boolean isRunning = true;
-    private int taskId;
-    private long sessionStartTime;
     private boolean isStudyPhase = true;
 
+    private int taskId;
+    private long sessionStartTime;
 
-    private void saveSpentTime() {
+    // TIME SAVING
+
+    private void saveAllTime() {
         long now = System.currentTimeMillis();
         long deltaSeconds = (now - sessionStartTime) / 1000;
 
+        if (deltaSeconds <= 0) return;
+
+        // total task time
         task.setSpentSeconds(task.getSpentSeconds() + deltaSeconds);
         dao.updateSpentTime(task.getId(), task.getSpentSeconds());
 
-        sessionStartTime = now; // reset
-    }
+        // daily time
+        String today = DateUtil.today();
+        if (!today.equals(task.getLastStudyDate())) {
+            task.setTodaySpentSeconds(0);
+        }
 
+        task.setTodaySpentSeconds(task.getTodaySpentSeconds() + deltaSeconds);
+        dao.updateTodaySpentTime(
+                task.getId(),
+                task.getTodaySpentSeconds(),
+                today
+        );
+
+        sessionStartTime = now;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,28 +67,24 @@ public class PomodoroActivity extends AppCompatActivity {
         dao = new TaskDAO(this);
         taskId = getIntent().getIntExtra("task_id", -1);
         task = dao.getTaskById(taskId);
+
         if (task == null) {
             finish();
             return;
         }
+
         studyTimeMs = task.getStudySeconds() * 1000;
+        breakTimeMs = task.getBreakSeconds() * 1000;
+
+        tvTask.setText(task.getTitle());
+
         sessionStartTime = System.currentTimeMillis();
-
-
-
-        String title = getIntent().getStringExtra("task_title");
-
-        tvTask.setText(title);
-
         startTimer(studyTimeMs, tvTimer);
-        task.setLastStartTime(System.currentTimeMillis());
-
-
 
         btnPause.setOnClickListener(v -> {
             if (isRunning) {
                 timer.cancel();
-                saveSpentTime();
+                saveAllTime();
                 btnPause.setText("Resume");
             } else {
                 sessionStartTime = System.currentTimeMillis();
@@ -81,39 +94,46 @@ public class PomodoroActivity extends AppCompatActivity {
             isRunning = !isRunning;
         });
 
+
         btnFinish.setOnClickListener(v -> {
-            saveSpentTime();
-            new TaskDAO(this).updateStatus(taskId, TaskDAO.COMPLETED);
+            if (timer != null) timer.cancel();
+            saveAllTime();
+            dao.updateStatus(taskId, TaskDAO.COMPLETED);
             finish();
         });
     }
 
+    //TIMER
+
     private void startTimer(long millis, TextView tv) {
         timer = new CountDownTimer(millis, 1000) {
 
+            @Override
             public void onTick(long ms) {
                 tv.setText(format(ms));
             }
 
+            @Override
             public void onFinish() {
-                saveSpentTime();
+                saveAllTime();
 
                 if (isStudyPhase) {
-                    // switch to BREAK
+                    // switch → BREAK
                     isStudyPhase = false;
-                    startTimer(task.getBreakSeconds() * 1000, tv);
+                    sessionStartTime = System.currentTimeMillis();
                     tv.setText("Break");
+                    startTimer(breakTimeMs, tv);
                 } else {
-                    // session fully done
-                    dao.updateStatus(taskId, TaskDAO.COMPLETED);
-                    finish();
+                    // switch → STUDY (loop continues)
+                    isStudyPhase = true;
+                    sessionStartTime = System.currentTimeMillis();
+                    tv.setText("Study");
+                    startTimer(studyTimeMs, tv);
                 }
             }
-
         }.start();
     }
-
-
+    
     private String format(long ms) {
         long totalSec = ms / 1000;
         long h = totalSec / 3600;
@@ -122,7 +142,6 @@ public class PomodoroActivity extends AppCompatActivity {
         return String.format("%02d:%02d:%02d", h, m, s);
     }
 
-
     private long parseTime(String t) {
         String[] p = t.split(":");
         long sec = Integer.parseInt(p[0]) * 3600L
@@ -130,5 +149,4 @@ public class PomodoroActivity extends AppCompatActivity {
                 + Integer.parseInt(p[2]);
         return sec * 1000;
     }
-
 }

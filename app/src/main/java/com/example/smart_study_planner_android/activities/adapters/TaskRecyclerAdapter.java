@@ -87,7 +87,9 @@ public class TaskRecyclerAdapter
         // START
         if (h.btnStart != null) {
             h.btnStart.setOnClickListener(v -> {
+
                 h.btnStart.setEnabled(false);
+                dao.markTaskStarted(t.getId());
                 dao.updateStatus(t.getId(), TaskDAO.RUNNING);
 
                 Intent i = new Intent(v.getContext(), PomodoroActivity.class);
@@ -106,6 +108,7 @@ public class TaskRecyclerAdapter
         // PAUSE
         if (h.btnPause != null) {
             h.btnPause.setOnClickListener(v -> {
+                dao.saveSessionTime(t.getId());
                 dao.updateStatus(t.getId(), TaskDAO.PAUSED);
                 if (listener != null) {
                     v.post(listener::onTaskChanged);
@@ -118,6 +121,7 @@ public class TaskRecyclerAdapter
         // FINISH
         if (h.btnFinish != null) {
             h.btnFinish.setOnClickListener(v -> {
+                dao.saveSessionTime(t.getId());
                 dao.updateStatus(t.getId(), TaskDAO.COMPLETED);
                 if (listener != null) {
                     v.post(listener::onTaskChanged);
@@ -141,6 +145,11 @@ public class TaskRecyclerAdapter
 
             });
         }
+        else if (status == TaskDAO.COMPLETED) {
+            // NO buttons, NO listeners
+            // Only display text
+        }
+
 
         // RUNNING → open Pomodoro
         if (status == TaskDAO.RUNNING) {
