@@ -15,6 +15,7 @@ public class PomodoroActivity extends AppCompatActivity {
 
     private TaskDAO dao;
     private Task task;
+    private boolean targetWarningShown = false;
 
     private long studyTimeMs;
     private long breakTimeMs;
@@ -52,6 +53,7 @@ public class PomodoroActivity extends AppCompatActivity {
         );
 
         sessionStartTime = now;
+        checkTargetExceeded();
     }
 
     @Override
@@ -133,7 +135,27 @@ public class PomodoroActivity extends AppCompatActivity {
             }
         }.start();
     }
-    
+    private void checkTargetExceeded() {
+        if (targetWarningShown) return;
+
+        if (task.getTargetSeconds() > 0 &&
+                task.getSpentSeconds() >= task.getTargetSeconds()) {
+
+            targetWarningShown = true;
+
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("Target Time Reached")
+                    .setMessage(
+                            "You have reached your planned study time for this task.\n\n" +
+                                    "You can continue studying or finish the task anytime."
+                    )
+                    .setPositiveButton("Continue", null)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        }
+    }
+
+
     private String format(long ms) {
         long totalSec = ms / 1000;
         long h = totalSec / 3600;
