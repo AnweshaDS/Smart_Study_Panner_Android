@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smart_study_planner_android.R;
+import com.example.smart_study_planner_android.activities.LoginActivity;
 import com.example.smart_study_planner_android.activities.adapters.TaskRecyclerAdapter;
 import com.example.smart_study_planner_android.activities.database.TaskDAO;
 import com.example.smart_study_planner_android.activities.model.Task;
@@ -23,6 +24,9 @@ import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import com.google.firebase.auth.FirebaseAuth;
+import android.content.Intent;
+
 
 
 public class TodoFragment extends Fragment {
@@ -56,7 +60,7 @@ public class TodoFragment extends Fragment {
             @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState
     ) {
-
+        ensureLoggedIn();
         View v = inflater.inflate(R.layout.fragment_todo, container, false);
 
         dao = new TaskDAO(requireContext());
@@ -110,6 +114,15 @@ public class TodoFragment extends Fragment {
 
         return v;
     }
+    private void ensureLoggedIn() {
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            Intent i = new Intent(requireContext(), LoginActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(i);
+            requireActivity().finish();
+        }
+    }
+
 
 
     private String format(long sec) {

@@ -14,7 +14,7 @@
     <string name="task_name">Task Name</string>
     <string name="timer_25_00">25:00</string>
     <string name="finish_task">Finish Task</string>
-    <string name="username">Username</string>
+    <string name="etEmail">Email</string>
     <string name="password">Password</string>
     <string name="login">Login</string>
     <string name="signup">Signup</string>

@@ -9,39 +9,49 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.smart_study_planner_android.R;
-import com.example.smart_study_planner_android.activities.database.UserDAO;
-import com.example.smart_study_planner_android.activities.model.User;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends AppCompatActivity {
+
+    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        EditText username = findViewById(R.id.etUsername);
-        EditText password = findViewById(R.id.etPassword);
+        auth = FirebaseAuth.getInstance();
+
+        EditText etEmail = findViewById(R.id.etEmail);
+        EditText etPassword = findViewById(R.id.etPassword);
         Button btnLogin = findViewById(R.id.btnLogin);
         Button btnSignup = findViewById(R.id.btnSignup);
 
-        UserDAO dao = new UserDAO(this);
-
         btnLogin.setOnClickListener(v -> {
-            User user = dao.login(
-                    username.getText().toString(),
-                    password.getText().toString()
-            );
+            String email = etEmail.getText().toString();
+            String pass = etPassword.getText().toString();
 
-            if (user == null) {
-                Toast.makeText(this, "Invalid login", Toast.LENGTH_SHORT).show();
-            } else {
-                startActivity(new Intent(this, MainActivity.class));
-                finish();
-            }
+            auth.signInWithEmailAndPassword(email, pass)
+                    .addOnSuccessListener(r -> goHome())
+                    .addOnFailureListener(e ->
+                            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show()
+                    );
         });
 
-        btnSignup.setOnClickListener(v ->
-                startActivity(new Intent(this, SignupActivity.class))
-        );
+        btnSignup.setOnClickListener(v -> {
+            String email = etEmail.getText().toString();
+            String pass = etPassword.getText().toString();
+
+            auth.createUserWithEmailAndPassword(email, pass)
+                    .addOnSuccessListener(r -> goHome())
+                    .addOnFailureListener(e ->
+                            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show()
+                    );
+        });
+    }
+
+    private void goHome() {
+        startActivity(new Intent(this, MainActivity.class));
+        finish();
     }
 }

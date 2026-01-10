@@ -1,6 +1,7 @@
 package com.example.smart_study_planner_android.activities.fragments;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
@@ -10,9 +11,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.smart_study_planner_android.R;
+import com.example.smart_study_planner_android.activities.LoginActivity;
 import com.example.smart_study_planner_android.activities.adapters.TaskRecyclerAdapter;
 import com.example.smart_study_planner_android.activities.database.TaskDAO;
 import com.example.smart_study_planner_android.activities.model.Task;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
 
@@ -24,6 +27,7 @@ public class PausedFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        ensureLoggedIn();
 
         View v = inflater.inflate(R.layout.fragment_paused, container, false);
         dao = new TaskDAO(requireContext());
@@ -45,6 +49,15 @@ public class PausedFragment extends Fragment {
         recycler.setAdapter(adapter);
         return v;
     }
+    private void ensureLoggedIn() {
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            Intent i = new Intent(requireContext(), LoginActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(i);
+            requireActivity().finish();
+        }
+    }
+
 
     private void refreshTasks() {
         adapter.refresh(dao.getTasksByStatus(TaskDAO.PAUSED));
