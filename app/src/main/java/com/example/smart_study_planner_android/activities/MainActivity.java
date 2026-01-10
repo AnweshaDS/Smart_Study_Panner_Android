@@ -9,6 +9,7 @@ import androidx.appcompat.widget.Toolbar;
 
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.smart_study_planner_android.R;
@@ -30,13 +31,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setOverflowIcon(
+                ContextCompat.getDrawable(this, R.drawable.ic_more_vert_black)
+        );
+
+        setSupportActionBar(toolbar);
 
 
-        // DB init
+
         TaskDAO dao = new TaskDAO(this);
         dao.createTable();
 
-        // Auth listener (single source of truth)
         authListener = firebaseAuth -> {
             FirebaseUser user = firebaseAuth.getCurrentUser();
             if (user == null) {
@@ -73,9 +78,7 @@ public class MainActivity extends AppCompatActivity {
             FirebaseAuth.getInstance().removeAuthStateListener(authListener);
         }
     }
-
-    // ===== MENU =====
-
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
