@@ -8,20 +8,37 @@ import android.database.sqlite.SQLiteDatabase;
 import com.example.smart_study_planner_android.activities.DateUtil;
 import com.example.smart_study_planner_android.activities.model.Task;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 
 public class TaskDAO {
 
     private final UserDAO helper;
-
+    private final Context context;
+    private FirebaseFirestore firestore;
+    private String uid;
     public static final int TODO = 0;
     public static final int RUNNING = 1;
     public static final int PAUSED = 2;
     public static final int COMPLETED = 3;
 
     public TaskDAO(Context context) {
+        this.context = context;
         helper = new UserDAO(context);
+        firestore = FirebaseFirestore.getInstance();
+
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        }
+
     }
 
     public void createTable() {
@@ -57,8 +74,11 @@ public class TaskDAO {
         cv.put("today_spent_seconds",task.getTodaySpentSeconds());
         cv.put("last_study_date",task.getLastStudyDate());
 
-        db.insert("tasks", null, cv);
+        long id= db.insert("tasks", null, cv);
+        task.setId((int) id);
         db.close();
+        syncTaskToFirestore(task);
+
     }
 
     public List<Task> getTasksByStatus(int status) {
@@ -93,17 +113,40 @@ public class TaskDAO {
 
     public long getTodayTotalSeconds() {
         SQLiteDatabase db = helper.getReadableDatabase();
+        String today = DateUtil.today();
         Cursor c = db.rawQuery(
-                "SELECT SUM(today_spent_seconds) FROM tasks",
-                null
+                "SELECT SUM(today_spent_seconds) FROM tasks WHERE last_study_date=?",
+                new String[]{today}
         );
         long total = 0;
         if (c.moveToFirst()) {
             total = c.getLong(0);
         }
         c.close();
+        db.close();
         return total;
     }
+
+    private void syncTaskToFirestore(Task task) {
+        if (uid == null) return;
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("title", task.getTitle());
+        map.put("status", task.getStatus());
+        map.put("targetSeconds", task.getTargetSeconds());
+        map.put("studySeconds", task.getStudySeconds());
+        map.put("breakSeconds", task.getBreakSeconds());
+        map.put("spentSeconds", task.getSpentSeconds());
+        map.put("todaySpentSeconds", task.getTodaySpentSeconds());
+        map.put("lastStudyDate", task.getLastStudyDate());
+
+        firestore.collection("users")
+                .document(uid)
+                .collection("tasks")
+                .document(String.valueOf(task.getId()))
+                .set(map);
+    }
+
 
 
     public Task getTaskById(int id) {
@@ -139,6 +182,11 @@ public class TaskDAO {
         ContentValues cv = new ContentValues();
         cv.put("spentSeconds", spent);
         db.update("tasks", cv, "id=?", new String[]{String.valueOf(id)});
+        Task task = getTaskById(id);
+        if (task != null) {
+            syncTaskToFirestore(task);
+        }
+
         db.close();
     }
 
@@ -149,6 +197,10 @@ public class TaskDAO {
         ContentValues cv = new ContentValues();
         cv.put("status", newStatus);
         db.update("tasks", cv, "id=?", new String[]{String.valueOf(taskId)});
+        Task task = getTaskById(taskId);
+        if (task != null) {
+            syncTaskToFirestore(task);
+        }
         db.close();
     }
 
@@ -159,6 +211,11 @@ public class TaskDAO {
         cv.put("last_study_date", date);
 
         db.update("tasks", cv, "id=?", new String[]{String.valueOf(taskId)});
+        Task task = getTaskById(taskId);
+        if (task != null) {
+            syncTaskToFirestore(task);
+        }
+
         db.close();
     }
 
@@ -181,9 +238,9 @@ public class TaskDAO {
         long todaySpent = c.getLong(1);
         String lastDate = c.getString(2);
 
-        java.text.SimpleDateFormat sdf =
-                new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US);
-        String today = sdf.format(new java.util.Date());
+        SimpleDateFormat sdf =
+                new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        String today = sdf.format(new Date());
 
 
         // reset daily if date changed
@@ -263,6 +320,12 @@ public class TaskDAO {
     public void deleteTask(int id) {
         SQLiteDatabase db = helper.getWritableDatabase();
         db.delete("tasks", "id=?", new String[]{String.valueOf(id)});
+        firestore.collection("users")
+                .document(uid)
+                .collection("tasks")
+                .document(String.valueOf(id))
+                .delete();
+
         db.close();
     }
 

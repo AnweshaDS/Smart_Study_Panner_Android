@@ -27,26 +27,65 @@ public class LoginActivity extends AppCompatActivity {
         Button btnLogin = findViewById(R.id.btnLogin);
         Button btnSignup = findViewById(R.id.btnSignup);
 
+        // LOGIN
         btnLogin.setOnClickListener(v -> {
-            String email = etEmail.getText().toString();
-            String pass = etPassword.getText().toString();
+            String email = etEmail.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
 
-            auth.signInWithEmailAndPassword(email, pass)
+            if (email.isEmpty()) {
+                etEmail.setError("Email required");
+                etEmail.requestFocus();
+                return;
+            }
+
+            if (password.isEmpty()) {
+                etPassword.setError("Password required");
+                etPassword.requestFocus();
+                return;
+            }
+
+            auth.signInWithEmailAndPassword(email, password)
                     .addOnSuccessListener(r -> goHome())
                     .addOnFailureListener(e ->
                             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show()
                     );
         });
 
+        // SIGN UP
         btnSignup.setOnClickListener(v -> {
-            String email = etEmail.getText().toString();
-            String pass = etPassword.getText().toString();
+            String email = etEmail.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
 
-            auth.createUserWithEmailAndPassword(email, pass)
-                    .addOnSuccessListener(r -> goHome())
-                    .addOnFailureListener(e ->
-                            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show()
-                    );
+            if (email.isEmpty()) {
+                etEmail.setError("Email required");
+                etEmail.requestFocus();
+                return;
+            }
+
+            if (password.isEmpty()) {
+                etPassword.setError("Password required");
+                etPassword.requestFocus();
+                return;
+            }
+
+            if (password.length() < 6) {
+                etPassword.setError("Password must be at least 6 characters");
+                etPassword.requestFocus();
+                return;
+            }
+
+            auth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            goHome();
+                        } else {
+                            Toast.makeText(
+                                    this,
+                                    task.getException().getMessage(),
+                                    Toast.LENGTH_LONG
+                            ).show();
+                        }
+                    });
         });
     }
 

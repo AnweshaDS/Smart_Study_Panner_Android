@@ -14,6 +14,8 @@ public class Task {
     private long lastStartTime;
     private long todaySpentSeconds;
     private String lastStudyDate; // format: yyyy-MM-dd
+    private String firestoreId;
+
 
 
     public static String formatSeconds(long sec) {
@@ -51,7 +53,7 @@ public class Task {
         this.breakSeconds = breakSeconds;
         this.spentSeconds = spentSeconds;
         this.lastStartTime = lastStartTime;
-        this.todaySpentSeconds = todaySpentSeconds ;
+        this.todaySpentSeconds = todaySpentSeconds;
         this.lastStudyDate = lastStudyDate;
     }
 
@@ -135,5 +137,13 @@ public class Task {
     public void setLastStudyDate(String lastStudyDate) {
         this.lastStudyDate = lastStudyDate;
     }
+    public String getFirestoreId() {
+        return firestoreId;
+    }
+
+    public void setFirestoreId(String firestoreId) {
+        this.firestoreId = firestoreId;
+    }
+
 
 }

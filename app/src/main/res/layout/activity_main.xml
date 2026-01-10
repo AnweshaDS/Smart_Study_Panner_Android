@@ -6,16 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.MainActivity">
-    <!--
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-        -->
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -27,21 +17,33 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <Button android:id="@+id/btnTodo" android:text="To-Do"
-                android:layout_width="0dp" android:layout_weight="1"
-                android:layout_height="wrap_content"/>
+            <Button
+                android:id="@+id/btnTodo"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="To-Do" />
 
-            <Button android:id="@+id/btnRunning" android:text="Running"
-                android:layout_width="0dp" android:layout_weight="1"
-                android:layout_height="wrap_content"/>
+            <Button
+                android:id="@+id/btnRunning"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Running" />
 
-            <Button android:id="@+id/btnPaused" android:text="Paused"
-                android:layout_width="0dp" android:layout_weight="1"
-                android:layout_height="wrap_content"/>
+            <Button
+                android:id="@+id/btnPaused"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Paused" />
 
-            <Button android:id="@+id/btnCompleted" android:text="Completed"
-                android:layout_width="0dp" android:layout_weight="1"
-                android:layout_height="wrap_content"/>
+            <Button
+                android:id="@+id/btnCompleted"
+                android:layout_width="0dp"
+                android:layout_height="66dp"
+                android:layout_weight="1"
+                android:text="Completed" />
         </LinearLayout>
 
         <FrameLayout
