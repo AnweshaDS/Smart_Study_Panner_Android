@@ -283,6 +283,12 @@ public class TaskDAO {
         String lastDate = c.getString(3);
 
         long now = System.currentTimeMillis() / 1000;
+        if (lastStart <= 0) {
+            c.close();
+            db.close();
+            return;
+        }
+
         long delta = now - lastStart;
         if (delta < 0) delta = 0;
 
@@ -302,6 +308,9 @@ public class TaskDAO {
 
         c.close();
         db.close();
+        Task task = getTaskById(taskId);
+        if (task != null) syncTaskToFirestore(task);
+
     }
 
     public void markTaskStarted(int taskId) {
@@ -320,13 +329,79 @@ public class TaskDAO {
     public void deleteTask(int id) {
         SQLiteDatabase db = helper.getWritableDatabase();
         db.delete("tasks", "id=?", new String[]{String.valueOf(id)});
+        db.close();
+
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        if (auth.getCurrentUser() == null) return;
+
+        String uid = auth.getCurrentUser().getUid();
+
         firestore.collection("users")
                 .document(uid)
                 .collection("tasks")
                 .document(String.valueOf(id))
                 .delete();
+    }
+
+    public void syncFromFirestore() {
+        if (uid == null) return;
+
+        firestore.collection("users")
+                .document(uid)
+                .collection("tasks")
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    for (var doc : snapshot.getDocuments()) {
+
+                        Task task = new Task(
+                                Integer.parseInt(doc.getId()),
+                                doc.getString("title"),
+                                doc.getLong("status").intValue(),
+                                doc.getLong("targetSeconds"),
+                                doc.getLong("studySeconds"),
+                                doc.getLong("breakSeconds"),
+                                doc.getLong("spentSeconds"),
+                                0,
+                                doc.getLong("todaySpentSeconds"),
+                                doc.getString("lastStudyDate")
+                        );
+
+                        upsertTask(task);
+                    }
+                });
+
+
+    }
+
+    public void upsertTask(Task task) {
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        ContentValues cv = new ContentValues();
+        cv.put("id", task.getId());
+        cv.put("title", task.getTitle());
+        cv.put("status", task.getStatus());
+        cv.put("targetSeconds", task.getTargetSeconds());
+        cv.put("studySeconds", task.getStudySeconds());
+        cv.put("breakSeconds", task.getBreakSeconds());
+        cv.put("spentSeconds", task.getSpentSeconds());
+        cv.put("lastStartTime", task.getLastStartTime());
+        cv.put("today_spent_seconds", task.getTodaySpentSeconds());
+        cv.put("last_study_date", task.getLastStudyDate());
+
+        int rows = db.update(
+                "tasks",
+                cv,
+                "id=?",
+                new String[]{String.valueOf(task.getId())}
+        );
+
+        if (rows == 0) {
+            db.insert("tasks", null, cv);
+        }
 
         db.close();
     }
+
+
 
 }

@@ -37,10 +37,10 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
-
-
         TaskDAO dao = new TaskDAO(this);
         dao.createTable();
+        dao.syncFromFirestore();
+
 
         authListener = firebaseAuth -> {
             FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
             FirebaseAuth.getInstance().removeAuthStateListener(authListener);
         }
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
