@@ -408,6 +408,4 @@ public class TaskDAO {
         db.close();
     }
 
-
-
 }

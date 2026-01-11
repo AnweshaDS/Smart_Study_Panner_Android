@@ -146,12 +146,11 @@ public class TaskRecyclerAdapter
             });
         }
         else if (status == TaskDAO.COMPLETED) {
-            // NO buttons, NO listeners
-            // Only display text
+
         }
 
 
-        // RUNNING → open Pomodoro
+        // RUNNING
         if (status == TaskDAO.RUNNING) {
             h.itemView.setOnClickListener(v -> {
                 Intent i = new Intent(v.getContext(), PomodoroActivity.class);

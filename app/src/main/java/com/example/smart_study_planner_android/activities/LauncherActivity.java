@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.smart_study_planner_android.R;
+import com.example.smart_study_planner_android.activities.LoginActivity;
 
 public class LauncherActivity extends AppCompatActivity {
 

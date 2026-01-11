@@ -11,23 +11,24 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.smart_study_planner_android.R;
 import com.example.smart_study_planner_android.activities.database.TaskDAO;
 import com.example.smart_study_planner_android.activities.model.Task;
+import com.example.smart_study_planner_android.activities.DateUtil;
 
 public class PomodoroActivity extends AppCompatActivity {
 
     private TaskDAO dao;
     private Task task;
-    private boolean targetWarningShown = false;
 
     private long studyTimeMs;
     private long breakTimeMs;
 
     private CountDownTimer timer;
-    private boolean isRunning = true;
     private boolean isStudyPhase = true;
 
     private int taskId;
     private long sessionStartTime;
+    private long phaseEndTime;
 
+    private boolean targetWarningShown = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,65 +43,88 @@ public class PomodoroActivity extends AppCompatActivity {
         dao = new TaskDAO(this);
         taskId = getIntent().getIntExtra("task_id", -1);
         task = dao.getTaskById(taskId);
-        dao.markTaskStarted(taskId);
-
 
         if (task == null) {
             finish();
             return;
         }
 
+        tvTask.setText(task.getTitle());
+
         studyTimeMs = task.getStudySeconds() * 1000;
         breakTimeMs = task.getBreakSeconds() * 1000;
-
-        tvTask.setText(task.getTitle());
 
         sessionStartTime = System.currentTimeMillis();
         startTimer(studyTimeMs, tvTimer);
 
         btnPause.setOnClickListener(v -> {
             timer.cancel();
-            dao.saveSessionTime(taskId);
+            saveAllTime();
             dao.updateStatus(taskId, TaskDAO.PAUSED);
             finish();
         });
 
-
-
         btnFinish.setOnClickListener(v -> {
             timer.cancel();
-            dao.saveSessionTime(taskId);
+            saveAllTime();
             dao.updateStatus(taskId, TaskDAO.COMPLETED);
             finish();
         });
-
     }
 
-    //TIMER
-
     private void startTimer(long millis, TextView tv) {
+
+        phaseEndTime = System.currentTimeMillis() + millis;
+
         timer = new CountDownTimer(millis, 1000) {
 
             @Override
-            public void onTick(long ms) {
-                tv.setText(format(ms));
+            public void onTick(long ignored) {
+                long remaining = phaseEndTime - System.currentTimeMillis();
+                if (remaining < 0) remaining = 0;
+                tv.setText(format(remaining));
             }
 
             @Override
             public void onFinish() {
+                tv.setText("00:00:00");
+                saveAllTime();
+
+                sessionStartTime = System.currentTimeMillis();
 
                 if (isStudyPhase) {
-                    // switch → BREAK
                     isStudyPhase = false;
                     startTimer(breakTimeMs, tv);
                 } else {
-                    // switch → STUDY (loop continues)
                     isStudyPhase = true;
                     startTimer(studyTimeMs, tv);
                 }
             }
         }.start();
     }
+
+    private void saveAllTime() {
+        long now = System.currentTimeMillis();
+        long deltaSeconds = (now - sessionStartTime) / 1000;
+        if (deltaSeconds <= 0) return;
+
+        long newSpent = task.getSpentSeconds() + deltaSeconds;
+        task.setSpentSeconds(newSpent);
+
+        String today = DateUtil.today();
+        if (!today.equals(task.getLastStudyDate())) {
+            task.setTodaySpentSeconds(0);
+        }
+
+        task.setTodaySpentSeconds(task.getTodaySpentSeconds() + deltaSeconds);
+        task.setLastStudyDate(today);
+
+        dao.upsertTask(task);
+        sessionStartTime = now;
+
+        checkTargetExceeded();
+    }
+
     private void checkTargetExceeded() {
         if (targetWarningShown) return;
 
@@ -112,15 +136,14 @@ public class PomodoroActivity extends AppCompatActivity {
             new AlertDialog.Builder(this)
                     .setTitle("Target Time Reached")
                     .setMessage(
-                            "You have reached your planned study time for this task.\n\n" +
-                                    "You can continue studying or finish the task anytime."
+                            "You have reached your planned study time.\n\n" +
+                                    "You may continue or finish the task."
                     )
-                    .setPositiveButton("Continue", null)
+                    .setPositiveButton("OK", null)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .show();
         }
     }
-
 
     private String format(long ms) {
         long totalSec = ms / 1000;
@@ -128,13 +151,5 @@ public class PomodoroActivity extends AppCompatActivity {
         long m = (totalSec % 3600) / 60;
         long s = totalSec % 60;
         return String.format("%02d:%02d:%02d", h, m, s);
-    }
-
-    private long parseTime(String t) {
-        String[] p = t.split(":");
-        long sec = Integer.parseInt(p[0]) * 3600L
-                + Integer.parseInt(p[1]) * 60L
-                + Integer.parseInt(p[2]);
-        return sec * 1000;
     }
 }
