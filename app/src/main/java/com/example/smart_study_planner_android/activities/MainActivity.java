@@ -24,31 +24,34 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth.AuthStateListener authListener;
+    private TaskDAO dao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setOverflowIcon(
                 ContextCompat.getDrawable(this, R.drawable.ic_more_vert_black)
         );
 
-        setSupportActionBar(toolbar);
 
-        TaskDAO dao = new TaskDAO(this);
+        dao = new TaskDAO(this);
         dao.createTable();
-        dao.syncFromFirestore();
-
 
         authListener = firebaseAuth -> {
             FirebaseUser user = firebaseAuth.getCurrentUser();
+
             if (user == null) {
                 Intent i = new Intent(MainActivity.this, LoginActivity.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(i);
                 finish();
+            } else {
+                dao.clearAllTasks();
+                dao.syncFromFirestore();
             }
         };
 
@@ -88,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_logout) {
+            TaskDAO dao = new TaskDAO(this);
+            dao.clearAllTasks();
             FirebaseAuth.getInstance().signOut();
             return true;
         }

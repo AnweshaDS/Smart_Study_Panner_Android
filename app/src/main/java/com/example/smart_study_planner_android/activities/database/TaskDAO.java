@@ -342,6 +342,12 @@ public class TaskDAO {
                 .document(String.valueOf(id))
                 .delete();
     }
+    public void clearAllTasks() {
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.delete("tasks", null, null);
+        db.close();
+    }
+
 
     public void syncFromFirestore() {
         if (uid == null) return;
